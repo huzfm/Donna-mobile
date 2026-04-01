@@ -5,7 +5,7 @@ import { useRootNavigationState, Redirect } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
 
 export default function Index() {
-  const { user } = useContext(AuthContext);
+  const { user, isAuthReady } = useContext(AuthContext);
   const rootNavigationState = useRootNavigationState();
   const [isReady, setIsReady] = useState(false);
 
@@ -17,7 +17,7 @@ export default function Index() {
   }, [rootNavigationState?.key]);
 
   // If not ready, show a simple loader
-  if (!isReady) {
+  if (!isReady || !isAuthReady) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#000" }}>
         <ActivityIndicator color="#007AFF" />

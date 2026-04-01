@@ -5,14 +5,14 @@ import {
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
-  SafeAreaView, 
   ActivityIndicator, 
   KeyboardAvoidingView, 
-  Platform,
-  Alert 
+  Platform
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAlert } from "../../context/AlertContext";
 import { supabase } from "../../services/supabase";
 
 export default function SignupScreen() {
@@ -21,15 +21,24 @@ export default function SignupScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { showAlert } = useAlert();
 
   const handleSignup = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert("Error", "Please fill in all fields.");
+      showAlert({
+        title: "Error",
+        message: "Please fill in all fields.",
+        type: "error"
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      showAlert({
+        title: "Error",
+        message: "Passwords do not match.",
+        type: "error"
+      });
       return;
     }
 
@@ -40,93 +49,101 @@ export default function SignupScreen() {
     });
 
     if (error) {
-      Alert.alert("Signup Failed", error.message);
+      showAlert({
+        title: "Signup Failed",
+        message: error.message,
+        type: "error"
+      });
       setLoading(false);
     } else {
-      Alert.alert(
-        "Check your email", 
-        "If you provided an email, you may need to confirm it before logging in.",
-        [{ text: "Go to Login", onPress: () => router.replace("/auth/login") }]
-      );
+      showAlert({
+        title: "Check your email",
+        message: "If you provided an email, you may need to confirm it before logging in.",
+        type: "success",
+        confirmText: "Go to Login",
+        onConfirm: () => router.replace("/auth/login")
+      });
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.inner}
       >
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-
-        <View style={styles.header}>
-          <View style={styles.logoBadge}>
-            <Ionicons name="sparkles-outline" size={32} color="#007AFF" />
-          </View>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join your advanced AI workspace</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="name@company.com"
-              placeholderTextColor="#555"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="••••••••"
-              placeholderTextColor="#555"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Confirm Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="••••••••"
-              placeholderTextColor="#555"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-            />
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.button, (!email || !password) && styles.buttonDisabled]} 
-            onPress={handleSignup}
-            disabled={loading || !email || !password}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Get Started</Text>
-            )}
+        <View style={styles.card}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={22} color="#1F2937" />
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.secondaryButton}
-            onPress={() => router.replace("/auth/login")}
-          >
-            <Text style={styles.secondaryButtonText}>
-              Already have an account? <Text style={styles.linkText}>Sign In</Text>
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.header}>
+            <View style={styles.logoBadge}>
+              <Ionicons name="sparkles-outline" size={32} color="#007AFF" />
+            </View>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Join your advanced AI workspace</Text>
+          </View>
+
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email Address</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="name@company.com"
+                placeholderTextColor="#555"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="••••••••"
+                placeholderTextColor="#555"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="••••••••"
+                placeholderTextColor="#555"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+              />
+            </View>
+
+            <TouchableOpacity 
+              style={[styles.button, (!email || !password) && styles.buttonDisabled]} 
+              onPress={handleSignup}
+              disabled={loading || !email || !password}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Get Started</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.secondaryButton}
+              onPress={() => router.replace("/auth/login")}
+            >
+              <Text style={styles.secondaryButtonText}>
+                Already have an account? <Text style={styles.linkText}>Sign In</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -136,16 +153,31 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#F8FAFC",
   },
   inner: {
     flex: 1,
-    padding: 30,
+    padding: 24,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  card: {
+    width: "100%",
+    maxWidth: 460,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 22,
+    padding: 24,
   },
   backButton: {
-    padding: 10,
-    marginBottom: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: "#F8FAFC",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
   },
   header: {
     alignItems: "center",
@@ -155,22 +187,24 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 16,
-    backgroundColor: "#111",
+    backgroundColor: "#EFF6FF",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#222",
+    borderColor: "#DBEAFE",
   },
   title: {
-    color: "#fff",
+    color: "#0F172A",
     fontSize: 28,
     fontWeight: "bold",
+    fontFamily: "DotoBold",
     marginBottom: 10,
   },
   subtitle: {
-    color: "#888",
+    color: "#64748B",
     fontSize: 16,
+    fontFamily: "MonoRegular",
   },
   form: {
     width: "100%",
@@ -179,21 +213,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: "#888",
+    color: "#475569",
     fontSize: 14,
     fontWeight: "600",
+    fontFamily: "MonoRegular",
     marginBottom: 10,
     marginLeft: 4,
   },
   input: {
-    backgroundColor: "#111",
-    color: "#fff",
+    backgroundColor: "#FFFFFF",
+    color: "#111827",
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 14,
     fontSize: 16,
+    fontFamily: "MonoRegular",
     borderWidth: 1,
-    borderColor: "#222",
+    borderColor: "#D1D5DB",
   },
   button: {
     backgroundColor: "#007AFF",
@@ -203,24 +239,27 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonDisabled: {
-    backgroundColor: "#1B3A5E",
+    backgroundColor: "#93C5FD",
     opacity: 0.7,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: "MonoRegular",
   },
   secondaryButton: {
     marginTop: 25,
     alignItems: "center",
   },
   secondaryButtonText: {
-    color: "#888",
+    color: "#64748B",
     fontSize: 14,
+    fontFamily: "MonoRegular",
   },
   linkText: {
     color: "#007AFF",
     fontWeight: "600",
+    fontFamily: "MonoRegular",
   },
 });
