@@ -1,10 +1,3 @@
-/**
- * app/api/settings+api.ts
- * Expo Router API route — replaces app/api/settings/route.ts (Next.js)
- *
- * GET   /api/settings  — load current user's Gmail settings
- * POST  /api/settings  — save / update Gmail credentials
- */
 
 import { getAuthenticatedUser } from "@/lib/supabase-api";
 

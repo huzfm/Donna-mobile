@@ -7,4 +7,5 @@ export type Message = {
 
 export type AuthContextType = {
   user: any;
+  isAuthReady: boolean;
 };

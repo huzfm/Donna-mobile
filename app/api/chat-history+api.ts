@@ -1,11 +1,3 @@
-/**
- * app/api/chat-history+api.ts
- * Expo Router API route — replaces app/api/chat-history/route.ts (Next.js)
- *
- * GET    /api/chat-history?session_id=xxx   — load messages for a session
- * POST   /api/chat-history                  — save a new message
- * DELETE /api/chat-history                  — clear all messages in a session
- */
 
 import { getAuthenticatedUser } from "@/lib/supabase-api";
 
