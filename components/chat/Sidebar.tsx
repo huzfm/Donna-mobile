@@ -229,7 +229,9 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
         <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
           <Text style={styles.sidebarHeader}>Gmail Sync</Text>
           <Text style={styles.tabSubtitle}>
-            Donna uses IMAP to fetch email context for your queries.
+            Save your Gmail and a Google App Password below. In chat, ask things like “Show my inbox”,
+            “Summarize my latest emails,” or use the /email shortcut — Donna reads mail there (this tab
+            only stores credentials, not your inbox list).
           </Text>
 
           {loadingSettings ? (
