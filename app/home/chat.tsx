@@ -2,18 +2,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    KeyboardAvoidingView,
-    Modal,
-    PanResponder,
-    Platform,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  PanResponder,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../../context/AlertContext";
@@ -121,7 +121,7 @@ export default function ChatScreen() {
     {
       command: "/email",
       title: "Read Inbox",
-      prompt: "Check and summarize my latest emails.",
+      prompt: "Show my inbox and summarize recent emails.",
       description: "Read and summarize your inbox",
       icon: "mail-outline",
     },
@@ -1147,13 +1147,14 @@ const styles = StyleSheet.create({
   },
   modalSendButton: {
     marginTop: 4,
-    backgroundColor: "#0A84FF",
+    backgroundColor: "black",
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: "center",
   },
   modalSendText: {
     color: "#fff",
+    backgroundColor: "black",
     fontSize: 15,
     fontWeight: "700",
     fontFamily: "MonoRegular",
@@ -1161,7 +1162,7 @@ const styles = StyleSheet.create({
   modalEnhanceButton: {
     marginTop: 2,
     marginBottom: 10,
-    backgroundColor: "#4B3FD6",
+    backgroundColor: "#000",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center",
@@ -1170,7 +1171,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalEnhanceText: {
-    color: "#fff",
+    color: "white",
+    backgroundColor: "black",
     fontSize: 14,
     fontWeight: "700",
     fontFamily: "MonoRegular",

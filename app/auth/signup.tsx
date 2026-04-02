@@ -1,21 +1,22 @@
-import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  ActivityIndicator, 
-  KeyboardAvoidingView, 
-  Platform
-} from "react-native";
-import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAlert } from "../../context/AlertContext";
 import { supabase } from "../../services/supabase";
 
 export default function SignupScreen() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,7 +25,8 @@ export default function SignupScreen() {
   const { showAlert } = useAlert();
 
   const handleSignup = async () => {
-    if (!email || !password || !confirmPassword) {
+    const trimmedName = name.trim();
+    if (!trimmedName || !email || !password || !confirmPassword) {
       showAlert({
         title: "Error",
         message: "Please fill in all fields.",
@@ -46,6 +48,12 @@ export default function SignupScreen() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: trimmedName,
+          name: trimmedName,
+        },
+      },
     });
 
     if (error) {
@@ -78,20 +86,31 @@ export default function SignupScreen() {
           </TouchableOpacity>
 
           <View style={styles.header}>
-            <View style={styles.logoBadge}>
-              <Ionicons name="sparkles-outline" size={32} color="#007AFF" />
-            </View>
+          
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Join your advanced AI workspace</Text>
           </View>
 
           <View style={styles.form}>
             <View style={styles.inputGroup}>
+              <Text style={styles.label}>Full name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="huzfm"
+                placeholderTextColor="#9CA3AF"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+                autoCorrect={false}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
               <Text style={styles.label}>Email Address</Text>
               <TextInput
                 style={styles.input}
-                placeholder="name@company.com"
-                placeholderTextColor="#555"
+                placeholder="huzfm@donna.ai"
+placeholderTextColor="#9CA3AF"    
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -104,7 +123,7 @@ export default function SignupScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="••••••••"
-                placeholderTextColor="#555"
+placeholderTextColor="#9CA3AF"    
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -124,9 +143,19 @@ export default function SignupScreen() {
             </View>
 
             <TouchableOpacity 
-              style={[styles.button, (!email || !password) && styles.buttonDisabled]} 
+              style={[
+                styles.button,
+                (!name.trim() || !email || !password || !confirmPassword) &&
+                  styles.buttonDisabled,
+              ]} 
               onPress={handleSignup}
-              disabled={loading || !email || !password}
+              disabled={
+                loading ||
+                !name.trim() ||
+                !email ||
+                !password ||
+                !confirmPassword
+              }
             >
               {loading ? (
                 <ActivityIndicator color="#fff" />

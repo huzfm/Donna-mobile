@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  ActivityIndicator, 
-  KeyboardAvoidingView, 
-  Platform 
-} from "react-native";
-import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
-import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
 import Constants from "expo-constants";
+import * as Linking from "expo-linking";
+import { useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAlert } from "../../context/AlertContext";
 import { supabase } from "../../services/supabase";
 
@@ -129,10 +129,7 @@ export default function LoginScreen() {
       >
         <View style={styles.card}>
           <View style={styles.header}>
-            <View style={styles.logoBadge}>
-              <Ionicons name="sparkles" size={32} color="#007AFF" />
-            </View>
-            <Text style={styles.title}>Welcome to Donna</Text>
+            <Text style={styles.title}> Donna</Text>
             <Text style={styles.subtitle}>Sign in to your AI workspace</Text>
           </View>
 
@@ -141,8 +138,8 @@ export default function LoginScreen() {
               <Text style={styles.label}>Email Address</Text>
               <TextInput
                 style={styles.input}
-                placeholder="name@company.com"
-                placeholderTextColor="#555"
+                placeholder="huzfm@donna.ai"
+          placeholderTextColor="#9CA3AF"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -155,7 +152,7 @@ export default function LoginScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="••••••••"
-                placeholderTextColor="#555"
+placeholderTextColor="#9CA3AF"    
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -189,7 +186,7 @@ export default function LoginScreen() {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Ionicons name="logo-google" size={18} color="#EA4335" />
+                  <Ionicons name="logo-google" size={18} color="#fff" />
                   <Text style={styles.googleButtonText}>Continue with Google</Text>
                 </>
               )}
@@ -249,7 +246,7 @@ const styles = StyleSheet.create({
     color: "#0F172A",
     fontSize: 28,
     fontWeight: "bold",
-    fontFamily: "DotoBold",
+    fontFamily: "MonoRegular",
     marginBottom: 10,
   },
   subtitle: {
@@ -322,14 +319,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#D1D5DB",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2C2C2E",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
   },
   googleButtonText: {
-    color: "#111827",
+    color: "white",
     fontSize: 15,
     fontWeight: "600",
     fontFamily: "MonoRegular",

@@ -15,8 +15,22 @@ import { getRecentEmails } from "@/lib/gmail";
 // ─── Intent Regexes ──────────────────────────────────────────────────────────
 
 const EMAIL_INTENT = /^(send\s+(an?\s+)?e?mail\s+|email\s+|mail\s+to\s+)/i;
-const GMAIL_INTENT =
-  /(check|read|show|summarize|what.{0,20}in)\s+(my\s+)?(inbox|emails?|mails?|gmail)/i;
+const GMAIL_SLASH = /^\/email\b/i;
+/** Allows text between the verb and "emails" (e.g. "summarize my latest emails"). */
+const GMAIL_INBOX_PHRASE =
+  /\b(check|read|show|summarize|view|list|see|open|fetch|pull)\b[\w\s,.'"-]{0,65}\b(inbox|emails?|mails?|gmail)\b/i;
+const GMAIL_WHAT_IN =
+  /what[\w\s']{0,24}\bin\b[\w\s,.'-]{0,35}\b(inbox|emails?|mails?|gmail)\b/i;
+
+function wantsGmailRead(question: string): boolean {
+  const q = question.trim();
+  return (
+    GMAIL_SLASH.test(q) ||
+    GMAIL_INBOX_PHRASE.test(q) ||
+    GMAIL_WHAT_IN.test(q)
+  );
+}
+
 const DIAGRAM_INTENT =
   /\b(draw|generate|create|make|show|visualize|diagram|flowchart|flow\s+chart|sequence\s+diagram|er\s+diagram|mindmap|mind\s+map|class\s+diagram|gantt|pie\s+chart|graph|chart)\b/i;
 const FILE_DIAGRAM_INTENT =
@@ -53,6 +67,59 @@ export async function POST(req: Request) {
             .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
             .join("\n")
         : "";
+
+    // ==============================
+    // 📬 GMAIL READ (before diagram — "show my inbox" must not hit DIAGRAM's "show")
+    // ==============================
+    if (wantsGmailRead(question)) {
+      try {
+        const { data: settings } = await supabase
+          .from("user_settings")
+          .select("gmail_user, gmail_app_password")
+          .eq("user_id", user.id)
+          .single();
+
+        if (!settings?.gmail_user || !settings?.gmail_app_password) {
+          return Response.json({
+            answer:
+              "⚙️ Gmail isn’t configured. Open the sidebar → **Gmail** tab, save your Gmail address and [Google App Password](https://support.google.com/accounts/answer/185833), then ask again.",
+          });
+        }
+
+        const emails = await getRecentEmails(settings.gmail_user, settings.gmail_app_password, 15);
+
+        if (emails.length === 0) {
+          return Response.json({ answer: "📭 Your inbox appears to be empty." });
+        }
+
+        const emailList = emails
+          .map((e, i) => `${i + 1}. From: ${e.from}\n   Subject: ${e.subject}\n   Date: ${e.date}`)
+          .join("\n\n");
+
+        const prompt = `
+You are a smart email assistant. Here are the user's latest Gmail messages:
+
+${emailList}
+
+${historyBlock ? `Conversation so far:\n${historyBlock}\n` : ""}
+User question: ${question}
+
+Give a concise, helpful summary:
+- 🔴 Any urgent or important emails (meetings, deadlines, action items)
+- 📬 Key senders and what they want
+- 📋 Quick summary of overall inbox state
+
+Be clear and structured. Use bullet points where helpful.
+`;
+
+        const answer = await askGroq(prompt);
+        return Response.json({ answer });
+      } catch (gmailErr: unknown) {
+        const msg = gmailErr instanceof Error ? gmailErr.message : "Unknown error";
+        console.error("GMAIL IMAP ERROR:", msg);
+        return Response.json({ answer: `❌ Couldn't read Gmail: ${msg}` });
+      }
+    }
 
     // ==============================
     // 📊 DIAGRAM / MERMAID INTENT
@@ -152,59 +219,6 @@ flowchart TD
 
       const answer = await askGroq(diagramPrompt);
       return Response.json({ answer });
-    }
-
-    // ==============================
-    // 📬 GMAIL READ INTENT
-    // ==============================
-    if (GMAIL_INTENT.test(question)) {
-      try {
-        const { data: settings } = await supabase
-          .from("user_settings")
-          .select("gmail_user, gmail_app_password")
-          .eq("user_id", user.id)
-          .single();
-
-        if (!settings?.gmail_user || !settings?.gmail_app_password) {
-          return Response.json({
-            answer:
-              "⚙️ Your Gmail is not configured. Go to Settings and add your Gmail and App Password.",
-          });
-        }
-
-        const emails = await getRecentEmails(settings.gmail_user, settings.gmail_app_password, 15);
-
-        if (emails.length === 0) {
-          return Response.json({ answer: "📭 Your inbox appears to be empty." });
-        }
-
-        const emailList = emails
-          .map((e, i) => `${i + 1}. From: ${e.from}\n   Subject: ${e.subject}\n   Date: ${e.date}`)
-          .join("\n\n");
-
-        const prompt = `
-You are a smart email assistant. Here are the user's latest Gmail messages:
-
-${emailList}
-
-${historyBlock ? `Conversation so far:\n${historyBlock}\n` : ""}
-User question: ${question}
-
-Give a concise, helpful summary:
-- 🔴 Any urgent or important emails (meetings, deadlines, action items)
-- 📬 Key senders and what they want
-- 📋 Quick summary of overall inbox state
-
-Be clear and structured. Use bullet points where helpful.
-`;
-
-        const answer = await askGroq(prompt);
-        return Response.json({ answer });
-      } catch (gmailErr: unknown) {
-        const msg = gmailErr instanceof Error ? gmailErr.message : "Unknown error";
-        console.error("GMAIL IMAP ERROR:", msg);
-        return Response.json({ answer: `❌ Couldn't read Gmail: ${msg}` });
-      }
     }
 
     // ==============================
