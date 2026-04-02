@@ -21,6 +21,8 @@ import { useAlert } from "../../context/AlertContext";
 import { AuthContext } from "../../context/AuthContext";
 import { supabase } from "../../services/supabase";
 
+import { apiUrl } from "@/lib/api-url";
+
 // Modular Components
 import { ChatHeader } from "../../components/chat/ChatHeader";
 import { ChatInput } from "../../components/chat/ChatInput";
@@ -171,7 +173,7 @@ export default function ChatScreen() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const res = await fetch("/api/chat-sessions", {
+      const res = await fetch(apiUrl("/api/chat-sessions"), {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       const data = await res.json();
@@ -191,9 +193,12 @@ export default function ChatScreen() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const res = await fetch(`/api/chat-history?session_id=${sessionId}`, {
+      const res = await fetch(
+        apiUrl(`/api/chat-history?session_id=${sessionId}`),
+        {
         headers: { Authorization: `Bearer ${session?.access_token}` },
-      });
+        }
+      );
       const data = await res.json();
       if (data.messages) {
         setMessages(data.messages);
@@ -211,7 +216,7 @@ export default function ChatScreen() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const res = await fetch("/api/upload", {
+      const res = await fetch(apiUrl("/api/upload"), {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       const data = await res.json();
@@ -237,7 +242,7 @@ export default function ChatScreen() {
           const {
             data: { session },
           } = await supabase.auth.getSession();
-          const res = await fetch("/api/upload", {
+          const res = await fetch(apiUrl("/api/upload"), {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -274,7 +279,7 @@ export default function ChatScreen() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const res = await fetch("/api/settings", {
+      const res = await fetch(apiUrl("/api/settings"), {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       const data = await res.json();
@@ -304,7 +309,7 @@ export default function ChatScreen() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const res = await fetch("/api/settings", {
+      const res = await fetch(apiUrl("/api/settings"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -356,7 +361,7 @@ export default function ChatScreen() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const res = await fetch("/api/chat-sessions", {
+      const res = await fetch(apiUrl("/api/chat-sessions"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -388,7 +393,7 @@ export default function ChatScreen() {
           const {
             data: { session },
           } = await supabase.auth.getSession();
-          const res = await fetch("/api/chat-sessions", {
+          const res = await fetch(apiUrl("/api/chat-sessions"), {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -434,7 +439,7 @@ export default function ChatScreen() {
       const {
         data: { session: authSession },
       } = await supabase.auth.getSession();
-      const res = await fetch("/api/chat-sessions", {
+      const res = await fetch(apiUrl("/api/chat-sessions"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -468,7 +473,7 @@ export default function ChatScreen() {
       } = await supabase.auth.getSession();
 
       // Non-blocking write for better perceived responsiveness.
-      fetch("/api/chat-history", {
+      fetch(apiUrl("/api/chat-history"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -486,7 +491,7 @@ export default function ChatScreen() {
         .slice(-8)
         .map((m) => ({ role: m.role, content: m.content }));
 
-      const queryRes = await fetch("/api/query", {
+      const queryRes = await fetch(apiUrl("/api/query"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -510,7 +515,7 @@ export default function ChatScreen() {
       setMessages((prev) => [...prev, aiMsg]);
 
       // Persist assistant message in background to avoid UI blocking.
-      fetch("/api/chat-history", {
+      fetch(apiUrl("/api/chat-history"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -531,7 +536,7 @@ export default function ChatScreen() {
           )
         );
 
-        fetch("/api/chat-sessions", {
+        fetch(apiUrl("/api/chat-sessions"), {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -617,7 +622,7 @@ export default function ChatScreen() {
       } = await supabase.auth.getSession();
 
       const emailPrompt = `Send email to ${emailTo.trim()} with subject "${emailSubject.trim()}" and body: ${emailBody.trim()}`;
-      const queryRes = await fetch("/api/query", {
+      const queryRes = await fetch(apiUrl("/api/query"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -686,7 +691,7 @@ Current subject: ${emailSubject || "(none)"}
 Current body:
 ${emailBody}`;
 
-      const queryRes = await fetch("/api/query", {
+      const queryRes = await fetch(apiUrl("/api/query"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

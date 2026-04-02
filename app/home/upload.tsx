@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { apiUrl } from "@/lib/api-url";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAlert } from "../../context/AlertContext";
 import { supabase } from "../../services/supabase";
@@ -40,7 +41,7 @@ export default function UploadScreen() {
         type: file.mimeType || "application/octet-stream",
       });
 
-      const res = await fetch("/api/upload", {
+      const res = await fetch(apiUrl("/api/upload"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
